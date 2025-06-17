@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -10,12 +10,12 @@ const Signup = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const [signedIn, setSignedIn] = useState(false);
 
   async function signUp() {
     try {
       const username = usernameRef.current?.value;
       const password = passwordRef.current?.value;
-
       if (!username || !password) {
         toast('Username or password is missing');
         return;
@@ -35,7 +35,7 @@ const Signup = () => {
     } catch (error) {
       if (error && typeof error === 'object' && 'status' in error && error.status === 411) {
         toast("User Already Exist Try To SignIn");
-        navigate("/Signin");
+        setSignedIn(true);
         return;
       }
       toast(`Signup failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -50,6 +50,11 @@ const Signup = () => {
         <Input placeholder="Username" reference={usernameRef} />
         <Input placeholder="Password" reference={passwordRef} />
         <Button onClick={signUp} title="Sign Up" variant="primary" size="md" />
+        {signedIn && (
+          <div className="text-sm text-red-600 cursor-pointer" onClick={() => navigate('/signin')}>
+            User already exists. Click here to sign in.
+          </div>
+        )}
       </div>
     </div>
   );
