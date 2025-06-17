@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Signup from "./pages/Signup"
 import Dashboard from "./pages/Dashboard"
 import { REACT_APP_API_URL } from "./config"
+import SignIn from "./pages/Signin"
 
 // Debug: Log the API URL on app load
 console.log("App loaded with API URL:", REACT_APP_API_URL)
@@ -37,6 +38,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<SignIn/>} />
         <Route
           path="/dashboard"
           element={

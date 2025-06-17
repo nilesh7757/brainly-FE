@@ -3,6 +3,7 @@ import Input from './Input';
 import axios from 'axios';
 type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT';
 import { REACT_APP_API_URL } from '../config';
+import { toast, ToastContainer } from 'react-toastify';
 const CreateContent = ({
   open,
   onClose,
@@ -68,7 +69,7 @@ const CreateContent = ({
         );
         
         console.log('Response:', response.data);
-        alert("Content created successfully!");
+        toast("Content created successfully!");
         setTags([]);
         setTagInput('');
         if (titleRef.current) titleRef.current.value = '';
@@ -92,6 +93,7 @@ const CreateContent = ({
 
   return (
     <div>
+      <ToastContainer />
       {open && (
         <div className="flex flex-col justify-center items-center gap-4 h-auto w-[50vw] rounded-md bg-white border border-red-500 p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Create Content</h2>

@@ -6,7 +6,9 @@ import CreateContent from '../components/CreateContent';
 import ShareButton from '../icons/ShareButton';
 import useContent from '../hooks/useContent';
 import axios from 'axios';
+import { toast,ToastContainer } from 'react-toastify';
 import { REACT_APP_API_URL } from '../config';
+import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const { content, refetch, loading, error } = useContent();
@@ -21,16 +23,23 @@ const Dashboard = () => {
         },
       });
       await refetch(); // Await refetch to ensure it completes after deletion
-      alert("Content deleted successfully!");
+      toast("Content deleted successfully!");
     } catch (error: any) {
       console.error('Error deleting content:', error.response?.data || error.message);
-      alert(`Failed to delete content: ${error.response?.data?.message || error.message}`);
+      toast(`Failed to delete content: ${error.response?.data?.message || error.message}`);
     }
+  }
+  const navigate = useNavigate();
+  function SignOut(){
+    localStorage.removeItem("token");
+    toast("Signed Out")
+    navigate("/signIn")
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       {/* Modal */}
+      <ToastContainer />
       {open && (
         <>
           <div className="flex justify-center items-center w-full h-full fixed left-0 top-0 z-50 p-4">
@@ -54,10 +63,11 @@ const Dashboard = () => {
           </div>
           <div className="flex gap-3">
             <Button
-              title="Share"
+              title="SignOut"
               size="md"
               variant="primary"
               startIcon={<ShareButton />}
+              onClick={()=>{SignOut()}}
             />
             <Button
               onClick={() => setOpen(true)}
@@ -104,6 +114,7 @@ const Dashboard = () => {
                     type={type}
                     tags={tags}
                     date={contentDate}
+                    className={"sm:w-[90vw]"}
                     onClick={() => deleteContent(_id)}
                     // onUpdate={() => console.log('Update functionality not implemented yet')}
                   />
