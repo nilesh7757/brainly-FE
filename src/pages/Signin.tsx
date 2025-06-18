@@ -5,17 +5,18 @@ import Button from '../components/Button';
 import axios from 'axios';
 import { REACT_APP_API_URL } from '../config';
 import { toast, ToastContainer } from 'react-toastify';
+import GoogleSignIn from './google';
 
 const SignIn = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
   const navigate = useNavigate();
 
   async function SignIn() {
     try {
       const username = usernameRef.current?.value;
       const password = passwordRef.current?.value;
-
       if (!username || !password) {
         toast('Username or password is missing');
         return;
@@ -40,11 +41,14 @@ const SignIn = () => {
   return (
     <div className="h-screen w-screen bg-gray-200 flex justify-center items-center">
       <ToastContainer />
-      <div className="bg-white rounded-md border flex flex-col gap-4 items-center p-3 w-[40%] h-[50%]">
+      <div className="bg-white rounded-md border border-gray-300 flex flex-col gap-4 items-center p-3  sm:w-[40%] max-h-[50%]">
         <div className="text-2xl font-medium text-purple-500">SignIn</div>
         <Input placeholder="Username" reference={usernameRef} />
         <Input placeholder="Password" reference={passwordRef} />
-        <Button onClick={SignIn} title="Signin" variant="primary" size="md" />
+        <Button onClick={SignIn} className='w-full rounded-md py-2 flex justify-center' title="Signin" variant="primary" size="md" />
+      <div className='w-full'>
+        <GoogleSignIn />
+      </div>
       </div>
     </div>
   );

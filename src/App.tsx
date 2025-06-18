@@ -4,6 +4,7 @@ import Signup from "./pages/Signup"
 import Dashboard from "./pages/Dashboard"
 import { REACT_APP_API_URL } from "./config"
 import SignIn from "./pages/Signin"
+import GoogleSignIn from "./pages/google"
 
 // Debug: Log the API URL on app load
 console.log("App loaded with API URL:", REACT_APP_API_URL)

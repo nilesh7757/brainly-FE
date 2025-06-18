@@ -10,7 +10,9 @@ const getApiUrl = (): string => {
 }
 
 export const REACT_APP_API_URL: string = getApiUrl()
+export const GOOGLE_CLIENT_ID: string = import.meta.env.VITE_GOOGLE_CLIENT_ID || "52074276999-hivborjh21pho32erp3jg6l7es1f3qc5.apps.googleusercontent.com"
 
 // Debug logging
 console.log("Environment:", import.meta.env.MODE)
 console.log("API URL:", REACT_APP_API_URL)
+console.log("Google Client ID:", GOOGLE_CLIENT_ID)

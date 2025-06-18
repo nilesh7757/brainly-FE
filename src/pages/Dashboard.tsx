@@ -64,15 +64,17 @@ const Dashboard = () => {
           <div className="flex gap-3">
             <Button
               title="SignOut"
-              size="md"
+              size="sm"
+              className={"sm:px-2 sm:py-2 px-2 py-1 rounded-md "}
               variant="primary"
               startIcon={<ShareButton />}
               onClick={()=>{SignOut()}}
             />
             <Button
               onClick={() => setOpen(true)}
+              className={"sm:px-2 sm:py-1 px-2 rounded-md underd-md"}
               title="Add Content"
-              size="md"
+              size="sm"
               variant="primary"
               startIcon={<PlusIcon />}
             />

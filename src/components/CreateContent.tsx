@@ -95,7 +95,7 @@ const CreateContent = ({
     <div>
       <ToastContainer />
       {open && (
-        <div className="flex flex-col justify-center items-center gap-4 h-auto w-[50vw] rounded-md bg-white border border-red-500 p-6 shadow-lg">
+        <div className="flex flex-col justify-center items-center gap-4 h-auto max-w-[90vw] rounded-md bg-white border border-red-500 p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Create Content</h2>
 
           {/* Content Type Selection */}
