@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Tag, Brain, Share2, Calendar, User, Globe, Copy, CheckCircle } from 'lucide-react';
 import axios from 'axios';
-
+import { useParams } from 'react-router-dom';
 interface Content {
   _id: string;
   title: string;
@@ -10,16 +10,6 @@ interface Content {
   tags: string[];
   createdAt?: string;
 }
-
-interface Params {
-  shareId: string;
-}
-
-// Replace with your actual hook for getting params
-const useParams = (): Params => {
-  // Implement your routing logic here
-  return { shareId: '' };
-};
 
 // const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'https://api.example.com';
 
