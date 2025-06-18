@@ -14,7 +14,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [signedIn, setSignedIn] = useState(false);
 
-  async function signUp() {
+  async function Signup() {
     try {
       const username = usernameRef.current?.value;
       const password = passwordRef.current?.value;

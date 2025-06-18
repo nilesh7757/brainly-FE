@@ -259,8 +259,8 @@ const Card = ({
           ))}
         </div>
       )}
-      <div>
-        <Button title="delete" variant='primary' size='md' onClick={onClick} />
+      <div className='flex justify-center'>
+        <Button className='rounded-md py-2 px-4' title="delete" variant='primary' size='md' onClick={onClick} />
       </div>
     </div>
   );

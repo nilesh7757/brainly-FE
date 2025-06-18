@@ -36,6 +36,30 @@ const Dashboard = () => {
     navigate("/signIn")
   }
 
+  async function Share() {
+    try {
+      const res = await axios.post(`${REACT_APP_API_URL}/api/v1/brain/share`, {}, {
+        headers: {
+          Authorization: localStorage.getItem('token') || '',
+        },
+      });
+      console.log(res.data.shareLink);
+      const shareLink = res.data.shareLink;
+  
+      if (!shareLink) {
+        toast("No share link found.");
+        return;
+      }
+  
+      await navigator.clipboard.writeText(shareLink);
+      toast("Link copied to clipboard!");
+    } catch (error) {
+      console.error("Error sharing content:", error);
+      toast("Error in sharing");
+    }
+  }
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
       {/* Modal */}
@@ -69,6 +93,14 @@ const Dashboard = () => {
               variant="primary"
               startIcon={<ShareButton />}
               onClick={()=>{SignOut()}}
+            />
+            <Button
+              title="Share"
+              size="sm"
+              className={"sm:px-2 sm:py-2 px-2 py-1 rounded-md "}
+              variant="primary"
+              startIcon={<ShareButton />}
+              onClick={()=>{Share()}}
             />
             <Button
               onClick={() => setOpen(true)}
