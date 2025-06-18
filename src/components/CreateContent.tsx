@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import Input from './Input';
 import axios from 'axios';
-import { X, Plus, Youtube, Twitter, FileText, Tag } from 'lucide-react';
+import { X, Plus, Youtube, Twitter, FileText, Tag, Upload, File } from 'lucide-react';
 import { toast } from 'react-toastify';
-type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT';
+type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'UPLOAD';
 
 const CreateContent = ({
   open,
@@ -16,10 +16,14 @@ const CreateContent = ({
 }) => {
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<ContentType>('YOUTUBE');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const contentTypes: { value: ContentType; label: string; icon: any; gradient: string }[] = [
     { 
@@ -39,6 +43,12 @@ const CreateContent = ({
       label: 'Document', 
       icon: FileText,
       gradient: 'from-green-500 to-green-600'
+    },
+    { 
+      value: 'UPLOAD', 
+      label: 'Upload File', 
+      icon: Upload,
+      gradient: 'from-purple-500 to-purple-600'
     },
   ];
 
@@ -61,17 +71,127 @@ const CreateContent = ({
     setTags(tags.filter((_, i) => i !== index));
   };
 
+  const handleFileSelect = (file: File) => {
+    // Validate file size (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('File size must be less than 50MB');
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'text/plain',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('File type not supported. Please upload PDF, image, or Office documents.');
+      return;
+    }
+
+    setSelectedFile(file);
+    if (titleRef.current && !titleRef.current.value) {
+      titleRef.current.value = file.name;
+    }
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async () => {
     const title = titleRef.current?.value;
     const link = linkRef.current?.value;
 
-    if (title && link) {
-      setIsLoading(true);
-      try {
-        console.log('API URL being used:', import.meta.env.VITE_API_URL);
-        console.log('Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
-        
-        const response = await axios.post(
+    if (selectedType === 'UPLOAD') {
+      if (!selectedFile || !title) {
+        alert("Please select a file and provide a title.");
+        return;
+      }
+    } else {
+      if (!title || !link) {
+        alert("Please fill in both the title and link fields.");
+        return;
+      }
+    }
+
+    setIsLoading(true);
+    setUploadProgress(0);
+
+    try {
+      let response;
+
+      if (selectedType === 'UPLOAD') {
+        // Upload file
+        const formData = new FormData();
+        formData.append('file', selectedFile!);
+        formData.append('title', title);
+        formData.append('tags', JSON.stringify(tags));
+
+        const uploadUrl = `${import.meta.env.VITE_API_URL}/api/v1/upload`;
+        console.log('🚀 Upload URL:', uploadUrl);
+        console.log('📁 File being uploaded:', selectedFile?.name, selectedFile?.size, selectedFile?.type);
+        console.log('🔑 Token present:', !!localStorage.getItem('token'));
+
+        response = await axios.post(
+          uploadUrl,
+          formData,
+          {
+            headers: {
+              Authorization: localStorage.getItem('token') || '',
+              'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(progress);
+              }
+            },
+          }
+        );
+      } else {
+        // Regular content creation
+        response = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/v1/content`,
           {
             type: selectedType,
@@ -85,29 +205,31 @@ const CreateContent = ({
             },
           }
         );
-        
-        console.log('Response:', response.data);
-        toast("Content created successfully!");
-        setTags([]);
-        setTagInput('');
-        if (titleRef.current) titleRef.current.value = '';
-        if (linkRef.current) linkRef.current.value = '';
-        await refetch();
-        onClose();
-      } catch (error: any) {
-        console.error('Failed to submit content:', error);
-        console.error('Error details:', {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status,
-          config: error.config
-        });
-        alert(`Failed to create content: ${error.response?.data?.message || error.message}`);
-      } finally {
-        setIsLoading(false);
       }
-    } else {
-      alert("Please fill in both the title and link fields.");
+      
+      console.log('Response:', response.data);
+      toast("Content created successfully!");
+      setTags([]);
+      setTagInput('');
+      setSelectedFile(null);
+      setUploadProgress(0);
+      if (titleRef.current) titleRef.current.value = '';
+      if (linkRef.current) linkRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      await refetch();
+      onClose();
+    } catch (error: any) {
+      console.error('Failed to submit content:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: error.config
+      });
+      alert(`Failed to create content: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsLoading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -188,8 +310,67 @@ const CreateContent = ({
                       ? 'https://twitter.com/...'
                       : 'Document URL or file path'
                   }
+                  disabled={selectedType === 'UPLOAD'}
                 />
               </div>
+
+              {/* File Upload Section */}
+              {selectedType === 'UPLOAD' && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Upload className="w-4 h-4 inline mr-1" />
+                    Upload File
+                  </label>
+                  
+                  {!selectedFile ? (
+                    <div
+                      className={`min-h-[120px] border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center transition-all duration-200 cursor-pointer ${
+                        isDragOver
+                          ? 'border-purple-400 bg-purple-50'
+                          : 'border-gray-300 hover:border-purple-300 hover:bg-purple-50'
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className={`w-8 h-8 mb-3 ${isDragOver ? 'text-purple-500' : 'text-gray-400'}`} />
+                      <p className="text-sm text-gray-600 text-center mb-2">
+                        <span className="font-medium text-purple-600">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500 text-center">
+                        PDF, Images, Office documents (max 50MB)
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <File className="w-8 h-8 text-green-600" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-green-800 truncate">{selectedFile.name}</p>
+                          <p className="text-xs text-green-600">
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                        <button
+                          onClick={removeFile}
+                          className="p-1 hover:bg-green-100 rounded-full transition-colors"
+                        >
+                          <X className="w-4 h-4 text-green-600" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                  />
+                </div>
+              )}
 
               {/* Tag Input */}
               <div>
@@ -234,10 +415,22 @@ const CreateContent = ({
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Creating...
+                    {selectedType === 'UPLOAD' ? (
+                      <>
+                        Uploading... {uploadProgress}%
+                        <div className="w-16 bg-white/20 rounded-full h-1">
+                          <div 
+                            className="bg-white h-1 rounded-full transition-all duration-300"
+                            style={{ width: `${uploadProgress}%` }}
+                          ></div>
+                        </div>
+                      </>
+                    ) : (
+                      'Creating...'
+                    )}
                   </div>
                 ) : (
-                  'Create Content'
+                  selectedType === 'UPLOAD' ? 'Upload File' : 'Create Content'
                 )}
               </button>
               <button

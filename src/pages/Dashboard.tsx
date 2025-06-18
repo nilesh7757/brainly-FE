@@ -8,9 +8,9 @@ import useContent from '../hooks/useContent';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { Youtube, Twitter, FileText, Filter, Tag, X } from 'lucide-react';
+import { Youtube, Twitter, FileText, Filter, Tag, X, Upload } from 'lucide-react';
 
-type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'ALL';
+type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'UPLOAD' | 'ALL';
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
@@ -54,6 +54,13 @@ const Dashboard = () => {
       icon: FileText,
       gradient: 'from-green-500 to-green-600',
       count: content?.filter(item => item.type === 'DOCUMENT').length || 0
+    },
+    { 
+      value: 'UPLOAD', 
+      label: 'Upload', 
+      icon: Upload,
+      gradient: 'from-purple-500 to-purple-600',
+      count: content?.filter(item => item.type === 'UPLOAD').length || 0
     },
   ];
 
@@ -197,28 +204,6 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats Section */}
-        <div className="mb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg">
-              <div className="text-3xl font-bold text-indigo-600">{content?.length || 0}</div>
-              <div className="text-gray-600 font-medium">Total Items</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg">
-              <div className="text-3xl font-bold text-purple-600">
-                {content ? new Set(content.flatMap(item => item.tags || [])).size : 0}
-              </div>
-              <div className="text-gray-600 font-medium">Unique Tags</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg">
-              <div className="text-3xl font-bold text-blue-600">
-                {content ? new Set(content.map(item => item.type)).size : 0}
-              </div>
-              <div className="text-gray-600 font-medium">Content Types</div>
-            </div>
-          </div>
-        </div>
-
         {/* Loading State */}
         {loading && (
           <div className="text-center py-16">

@@ -50,7 +50,7 @@ declare global {
 }
 
 interface CardProps {
-  type: "YOUTUBE" | "TWITTER" | "DOCUMENT";
+  type: "YOUTUBE" | "TWITTER" | "DOCUMENT" | "UPLOAD";
   title: string;
   link: string;
   date: Date;
@@ -177,9 +177,9 @@ const Card = ({
         const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`;
 
         return (
-          <div className="relative overflow-hidden rounded-2xl bg-black shadow-xl ring-1 ring-black/5">
+          <div className="relative overflow-hidden rounded-2xl bg-black shadow-xl ring-1 ring-black/5 h-full">
             <iframe
-              className="w-full aspect-video"
+              className="w-full h-full"
               src={embedUrl}
               title={title || "YouTube video"}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -191,7 +191,7 @@ const Card = ({
         );
       } else {
         return (
-          <div className="p-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-2xl">
+          <div className="p-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-2xl h-full flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -221,7 +221,7 @@ const Card = ({
       const tweetId = extractTweetId(link);
       if (!tweetId) {
         return (
-          <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl">
+          <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl h-full flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -246,8 +246,8 @@ const Card = ({
       }
 
       return (
-        <div className="relative">
-          <div ref={tweetRef} className="w-full min-h-[120px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center">
+        <div className="relative h-full">
+          <div ref={tweetRef} className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center">
             {!twitterLoaded && (
               <div className="flex items-center gap-3 text-gray-500">
                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
@@ -259,33 +259,133 @@ const Card = ({
       );
     }
 
-    return (
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 border border-gray-200 shadow-sm">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
-        <div className="relative p-6">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-3-3v6m5 1V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h6" />
-              </svg>
+    // Document and Upload preview functionality (treat them the same)
+    if (type === 'DOCUMENT' || type === 'UPLOAD') {
+      const getDocumentPreview = () => {
+        const url = link.toLowerCase();
+        
+        // Check if it's a PDF
+        if (url.includes('.pdf') || url.includes('pdf')) {
+          return (
+            <div className="relative h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white"></div>
+              <iframe
+                src={`${link}#page=1`}
+                className="w-full h-full"
+                title="Document Preview"
+                loading="lazy"
+              />
+              <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-gray-600 font-medium shadow-sm">
+                Page 1
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <a
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-start gap-2 text-gray-800 hover:text-indigo-600 font-medium text-sm transition-colors"
-              >
-                <span className="break-all leading-relaxed">{title}</span>
-                <svg className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 flex-shrink-0 mt-0.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
+          );
+        }
+        
+        // Check if it's an image
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+        const isImage = imageExtensions.some(ext => url.includes(ext));
+        
+        if (isImage) {
+          return (
+            <div className="relative h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+              <img
+                src={link}
+                alt={title}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  // Fallback to document icon if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.parentElement!.innerHTML = `
+                    <div class="h-full flex flex-col justify-center items-center p-6 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+                      <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-3-3v6m5 1V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h6" />
+                        </svg>
+                      </div>
+                      <p class="text-gray-600 text-sm text-center">Image preview unavailable</p>
+                    </div>
+                  `;
+                }}
+              />
+              <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-gray-600 font-medium shadow-sm">
+                Image
+              </div>
+            </div>
+          );
+        }
+        
+        // Check if it's a Google Doc, Sheet, or Slide
+        if (url.includes('docs.google.com') || url.includes('drive.google.com')) {
+          const docId = extractGoogleDocId(link);
+          if (docId) {
+            return (
+              <div className="relative h-full bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                <iframe
+                  src={`https://docs.google.com/document/d/${docId}/preview`}
+                  className="w-full h-full"
+                  title="Google Doc Preview"
+                  loading="lazy"
+                />
+                <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs text-gray-600 font-medium shadow-sm">
+                  Google Doc
+                </div>
+              </div>
+            );
+          }
+        }
+        
+        // Default document view
+        return (
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 border border-gray-200 shadow-sm h-full flex flex-col justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+            <div className="relative p-6">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-3-3v6m5 1V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h6" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-start gap-2 text-gray-800 hover:text-indigo-600 font-medium text-sm transition-colors"
+                  >
+                    <span className="break-all leading-relaxed">{title}</span>
+                    <svg className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 flex-shrink-0 mt-0.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    );
+        );
+      };
+
+      return getDocumentPreview();
+    }
+
+    return null;
+  };
+
+  // Helper function to extract Google Doc ID
+  const extractGoogleDocId = (url: string) => {
+    const patterns = [
+      /\/d\/([a-zA-Z0-9-_]+)/,
+      /id=([a-zA-Z0-9-_]+)/,
+      /\/document\/d\/([a-zA-Z0-9-_]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) return match[1];
+    }
+    return null;
   };
 
   const formatDate = (date: Date) => {
@@ -301,16 +401,16 @@ const Card = ({
       className={`
         group relative bg-white border border-gray-200 rounded-3xl shadow-lg hover:shadow-2xl 
         transition-all duration-500 ease-out transform hover:-translate-y-1
-        w-full max-w-md backdrop-blur-sm overflow-hidden
+        w-full max-w-md backdrop-blur-sm overflow-hidden h-[500px] flex flex-col
         ${className}
       `}
     >
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/30 pointer-events-none"></div>
       
-      <div className="relative p-6">
+      <div className="relative p-6 flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start justify-between mb-6 flex-shrink-0">
           <div className="flex items-center gap-4 flex-1 min-w-0">
             {getTypeIcon()}
             <div className="flex-1 min-w-0">
@@ -327,13 +427,15 @@ const Card = ({
         </div>
 
         {/* Content */}
-        <div className="mb-6">
-          {renderContent()}
+        <div className="mb-6 flex-1 min-h-0">
+          <div className="h-full">
+            {renderContent()}
+          </div>
         </div>
 
         {/* Tags */}
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6 flex-shrink-0">
             {tags.map((tag, index) => (
               <span
                 key={index}
@@ -349,7 +451,7 @@ const Card = ({
         )}
 
         {/* Action Button */}
-        <div className="flex justify-center pt-2">
+        <div className="flex justify-center pt-2 flex-shrink-0">
           <Button 
             className="rounded-xl px-6 py-2.5 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" 
             title="Delete" 
