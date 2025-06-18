@@ -3,7 +3,6 @@ import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { REACT_APP_API_URL } from '../config';
 
 const GoogleSignIn: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +16,7 @@ const GoogleSignIn: React.FC = () => {
     }
 
     try {
-      const res = await axios.post(`${REACT_APP_API_URL}/api/v1/google-signin`, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/google-signin`, {
         token,
       });
       console.log(token);

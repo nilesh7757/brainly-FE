@@ -7,7 +7,6 @@ import ShareButton from '../icons/ShareButton';
 import useContent from '../hooks/useContent';
 import axios from 'axios';
 import { toast,ToastContainer } from 'react-toastify';
-import { REACT_APP_API_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
@@ -16,7 +15,7 @@ const Dashboard = () => {
   async function deleteContent(contentId: string) {
     try {
       console.log('Deleting content with ID:', contentId);
-      await axios.delete(`${REACT_APP_API_URL}/api/v1/content`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/content`, {
         data: { contentId },
         headers: {
           Authorization: localStorage.getItem('token') || '',
@@ -38,7 +37,7 @@ const Dashboard = () => {
 
   async function Share() {
     try {
-      const res = await axios.post(`${REACT_APP_API_URL}/api/v1/brain/share`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/brain/share`, {}, {
         headers: {
           Authorization: localStorage.getItem('token') || '',
         },

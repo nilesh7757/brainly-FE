@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import axios from 'axios';
-import { REACT_APP_API_URL } from '../config';
 import { toast, ToastContainer } from 'react-toastify';
 import GoogleSignIn from './google';
 
@@ -22,7 +21,7 @@ const SignIn = () => {
         return;
       }
 
-      const res = await axios.post(`${REACT_APP_API_URL}/api/v1/signin`, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/signin`, {
         username,
         password,
       });

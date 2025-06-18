@@ -2,7 +2,6 @@ import { useRef, useState } from 'react';
 import Input from './Input';
 import axios from 'axios';
 import { X, Plus, Youtube, Twitter, FileText, Tag } from 'lucide-react';
-import { REACT_APP_API_URL } from '../config';
 import { toast, ToastContainer } from 'react-toastify';
 
 type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT';
@@ -70,11 +69,11 @@ const CreateContent = ({
     if (title && link) {
       setIsLoading(true);
       try {
-        console.log('API URL being used:', REACT_APP_API_URL);
+        console.log('API URL being used:', import.meta.env.VITE_API_URL);
         console.log('Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
         
         const response = await axios.post(
-          `${REACT_APP_API_URL}/api/v1/content`,
+          `${import.meta.env.VITE_API_URL}/api/v1/content`,
           {
             type: selectedType,
             title,

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { REACT_APP_API_URL } from "../config"
 
 interface Content {
   _id: string;
@@ -28,9 +27,9 @@ const useContent = () => {
         throw new Error("No authentication token found")
       }
 
-      console.log("Fetching from:", `${REACT_APP_API_URL}/api/v1/content`)
+      console.log("Fetching from:", `${import.meta.env.VITE_API_URL}/api/v1/content`)
 
-      const response = await axios.get(`${REACT_APP_API_URL}/api/v1/content`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/content`, {
         headers: {
           Authorization: token,
         },

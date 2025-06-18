@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Tag, Brain, Share2, Calendar, User, Globe, Copy, CheckCircle } from 'lucide-react';
 import axios from 'axios';
-import { REACT_APP_API_URL } from '../config';
 
 interface Content {
   _id: string;
@@ -35,7 +34,7 @@ const SharePage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${REACT_APP_API_URL}/api/v1/brain/${shareId}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/brain/${shareId}`);
         setUsername(res.data.username);
         setContent(res.data.content);
         setLoading(false);
