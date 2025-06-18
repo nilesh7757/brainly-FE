@@ -250,35 +250,6 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .animation-delay-150 {
-          animation-delay: 150ms;
-        }
-        .animation-delay-300 {
-          animation-delay: 300ms;
-        }
-        .animation-delay-700 {
-          animation-delay: 700ms;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes zoomIn {
-          from { transform: scale(0.9); }
-          to { transform: scale(1); }
-        }
-        .animate-in {
-          animation: fadeIn 0.3s ease-out;
-        }
-        .fade-in {
-          animation: fadeIn 0.2s ease-out;
-        }
-        .zoom-in {
-          animation: zoomIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 };

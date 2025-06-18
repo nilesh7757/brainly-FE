@@ -8,7 +8,7 @@ interface Content {
   _id: string;
   title: string;
   link: string;
-  type: string;
+  type: "YOUTUBE" | "TWITTER" | "DOCUMENT";
   tags: string[];
   createdAt: string;
 }
