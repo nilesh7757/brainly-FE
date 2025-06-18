@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import GoogleSignIn from './google';
 
 const Signup = () => {
@@ -49,7 +49,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center p-4">
-      <ToastContainer />
       <div className="w-full max-w-md">
         {/* Main Card */}
         <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 p-8 space-y-6">

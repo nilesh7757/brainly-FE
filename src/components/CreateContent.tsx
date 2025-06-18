@@ -2,8 +2,7 @@ import { useRef, useState } from 'react';
 import Input from './Input';
 import axios from 'axios';
 import { X, Plus, Youtube, Twitter, FileText, Tag } from 'lucide-react';
-import { toast, ToastContainer } from 'react-toastify';
-
+import { toast } from 'react-toastify';
 type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT';
 
 const CreateContent = ({
@@ -116,7 +115,6 @@ const CreateContent = ({
 
   return (
     <div>
-      <ToastContainer />
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
         <div className="relative w-full max-w-lg bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
           {/* Decorative gradient overlay */}

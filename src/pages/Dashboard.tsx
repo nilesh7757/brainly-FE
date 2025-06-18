@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PlusIcon from '../icons/PlusIcon';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -6,12 +6,93 @@ import CreateContent from '../components/CreateContent';
 import ShareButton from '../icons/ShareButton';
 import useContent from '../hooks/useContent';
 import axios from 'axios';
-import { toast,ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Youtube, Twitter, FileText, Filter, Tag, X } from 'lucide-react';
+
+type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'ALL';
+
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<ContentType>('ALL');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { content, refetch, loading, error } = useContent();
   const navigate = useNavigate();
+
+  // Get all unique tags from content
+  const allTags = useMemo(() => {
+    const tags = content?.flatMap(item => item.tags || []) || [];
+    return [...new Set(tags)].sort();
+  }, [content]);
+
+  // Content type configuration for filters
+  const contentTypes: { value: ContentType; label: string; icon: any; gradient: string; count: number }[] = [
+    { 
+      value: 'ALL', 
+      label: 'All', 
+      icon: Filter,
+      gradient: 'from-gray-500 to-gray-600',
+      count: content?.length || 0
+    },
+    { 
+      value: 'YOUTUBE', 
+      label: 'YouTube', 
+      icon: Youtube,
+      gradient: 'from-red-500 to-red-600',
+      count: content?.filter(item => item.type === 'YOUTUBE').length || 0
+    },
+    { 
+      value: 'TWITTER', 
+      label: 'Twitter', 
+      icon: Twitter,
+      gradient: 'from-blue-500 to-blue-600',
+      count: content?.filter(item => item.type === 'TWITTER').length || 0
+    },
+    { 
+      value: 'DOCUMENT', 
+      label: 'Document', 
+      icon: FileText,
+      gradient: 'from-green-500 to-green-600',
+      count: content?.filter(item => item.type === 'DOCUMENT').length || 0
+    },
+  ];
+
+  // Filter content based on selected filter and tags
+  const filteredContent = useMemo(() => {
+    let filtered = content || [];
+
+    // Filter by content type
+    if (selectedFilter !== 'ALL') {
+      filtered = filtered.filter(item => item.type === selectedFilter);
+    }
+
+    // Filter by tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(item => 
+        selectedTags.every(tag => item.tags?.includes(tag))
+      );
+    }
+
+    return filtered;
+  }, [content, selectedFilter, selectedTags]);
+
+  // Add tag to filter
+  const addTagFilter = (tag: string) => {
+    if (!selectedTags.includes(tag)) {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  // Remove tag from filter
+  const removeTagFilter = (tag: string) => {
+    setSelectedTags(selectedTags.filter(t => t !== tag));
+  };
+
+  // Clear all tag filters
+  const clearTagFilters = () => {
+    setSelectedTags([]);
+  };
+
   async function deleteContent(contentId: string) {
     try {
       console.log('Deleting content with ID:', contentId);
@@ -59,20 +140,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
-      {/* Toast Container */}
-      <ToastContainer 
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        className="mt-16"
-      />
-
       {/* Modal */}
       {open && (
         <>
@@ -187,15 +254,120 @@ const Dashboard = () => {
         {/* Content Grid */}
         {!loading && !error && content.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h2 className="text-2xl font-bold text-gray-800">Your Collection</h2>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                {content.length} items
+                {filteredContent.length} of {content.length} items
+              </div>
+            </div>
+
+            {/* Filter Section */}
+            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg space-y-6">
+              {/* Content Type Filters */}
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by type:</span>
+                  {contentTypes.map((type) => {
+                    const IconComponent = type.icon;
+                    const isSelected = selectedFilter === type.value;
+                    
+                    return (
+                      <button
+                        key={type.value}
+                        onClick={() => setSelectedFilter(type.value)}
+                        className={`relative px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
+                          isSelected
+                            ? `bg-gradient-to-r ${type.gradient} text-white shadow-lg`
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent hover:border-gray-300'
+                        }`}
+                      >
+                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        <span className="text-sm font-medium">{type.label}</span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          isSelected 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-gray-200 text-gray-600'
+                        }`}>
+                          {type.count}
+                        </span>
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-xl ring-2 ring-white/30"></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tag Filters */}
+              <div>
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by tags:</span>
+                  {selectedTags.length > 0 && (
+                    <button
+                      onClick={clearTagFilters}
+                      className="text-xs text-gray-500 hover:text-gray-700 underline"
+                    >
+                      Clear all
+                    </button>
+                  )}
+                </div>
+                
+                {/* Selected Tags */}
+                {selectedTags.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    {selectedTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+                      >
+                        <Tag className="w-3 h-3" />
+                        {tag}
+                        <button 
+                          onClick={() => removeTagFilter(tag)} 
+                          className="ml-1 hover:bg-white/20 rounded-full p-0.5 transition-colors duration-200"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Available Tags */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {allTags.map((tag) => {
+                    const isSelected = selectedTags.includes(tag);
+                    const tagCount = content?.filter(item => item.tags?.includes(tag)).length || 0;
+                    
+                    return (
+                      <button
+                        key={tag}
+                        onClick={() => isSelected ? removeTagFilter(tag) : addTagFilter(tag)}
+                        className={`relative px-3 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-1 text-sm font-medium ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                        }`}
+                      >
+                        <Tag className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        {tag}
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                          isSelected 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-gray-200 text-gray-600'
+                        }`}>
+                          {tagCount}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {content.map(({ _id, type, link, title, tags, createdAt }) => {
+              {filteredContent.map(({ _id, type, link, title, tags, createdAt }) => {
                 const parsedDate = new Date(createdAt);
                 const contentDate = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
                 return (
@@ -216,6 +388,42 @@ const Dashboard = () => {
                 );
               })}
             </div>
+
+            {/* No results for filter */}
+            {filteredContent.length === 0 && content.length > 0 && (
+              <div className="text-center py-16">
+                <div className="bg-gray-50/80 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 max-w-md mx-auto shadow-lg">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Filter className="w-8 h-8 text-gray-600" />
+                  </div>
+                  <p className="text-gray-700 font-medium mb-4">
+                    No content found
+                    {selectedFilter !== 'ALL' && ` for ${selectedFilter.toLowerCase()}`}
+                    {selectedTags.length > 0 && ` with tags: ${selectedTags.join(', ')}`}
+                  </p>
+                  <p className="text-gray-500 text-sm mb-6">
+                    Try adjusting your filters or add new content
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button
+                      onClick={() => {
+                        setSelectedFilter('ALL');
+                        setSelectedTags([]);
+                      }}
+                      className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Clear All Filters
+                    </button>
+                    <button
+                      onClick={() => setOpen(true)}
+                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Add Content
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

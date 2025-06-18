@@ -5,7 +5,8 @@ import Dashboard from "./pages/Dashboard"
 import SignIn from "./pages/Signin"
 import GoogleSignIn from "./pages/google"
 import SharePage from "./pages/SharePage"
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // Debug: Log the API URL on app load
 console.log("App loaded with API URL:", import.meta.env.VITE_API_URL)
 console.log("Environment variables:", {
@@ -37,6 +38,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const App = () => {
   return (
     <BrowserRouter>
+      <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
       <Route path="/share/:shareId" element={<SharePage />} />
         <Route path="/signup" element={<Signup />} />
