@@ -31,14 +31,17 @@ const GoogleSignIn: React.FC = () => {
   };
 
   return (
-    <div className='w-full'>
-      <GoogleLogin
+    <div className="w-full flex justify-center">
+  <div className="w-full max-w-sm">
+    <GoogleLogin
       onSuccess={handleGoogleLoginSuccess}
       onError={() => toast('Google Sign-In Failed')}
-      logo_alignment='center'
-      size='large'
+      logo_alignment="center"
+      size="large"
     />
-    </div>
+  </div>
+</div>
+
   );
 };
 
