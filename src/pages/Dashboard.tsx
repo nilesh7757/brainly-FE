@@ -8,9 +8,9 @@ import useContent from '../hooks/useContent';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { Youtube, Twitter, FileText, Filter, Tag, X, Upload } from 'lucide-react';
+import { Youtube, Twitter, FileText, Filter, Tag, X } from 'lucide-react';
 
-type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'UPLOAD' | 'ALL';
+type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'ALL';
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
@@ -55,13 +55,6 @@ const Dashboard = () => {
       gradient: 'from-green-500 to-green-600',
       count: content?.filter(item => item.type === 'DOCUMENT').length || 0
     },
-    { 
-      value: 'UPLOAD', 
-      label: 'Upload', 
-      icon: Upload,
-      gradient: 'from-purple-500 to-purple-600',
-      count: content?.filter(item => item.type === 'UPLOAD').length || 0
-    },
   ];
 
   // Filter content based on selected filter and tags
@@ -102,7 +95,6 @@ const Dashboard = () => {
 
   async function deleteContent(contentId: string) {
     try {
-      console.log('Deleting content with ID:', contentId);
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/content`, {
         data: { contentId },
         headers: {
@@ -268,13 +260,6 @@ const Dashboard = () => {
                       >
                         <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
                         <span className="text-sm font-medium">{type.label}</span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          isSelected 
-                            ? 'bg-white/20 text-white' 
-                            : 'bg-gray-200 text-gray-600'
-                        }`}>
-                          {type.count}
-                        </span>
                         {isSelected && (
                           <div className="absolute inset-0 rounded-xl ring-2 ring-white/30"></div>
                         )}

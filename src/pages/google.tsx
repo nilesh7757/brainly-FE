@@ -7,25 +7,18 @@ import { useNavigate } from 'react-router-dom';
 const GoogleSignIn: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
-    const token = credentialResponse.credential;
-    console.log("credentialResponse");
-    if (!token) {
-      toast('Invalid Google credential');
-      return;
-    }
-
+  const handleCredentialResponse = async (credentialResponse: any) => {
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/google-signin`, {
-        token,
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/google`, {
+        credential: credentialResponse.credential,
       });
-      console.log(token);
-      localStorage.setItem('token', res.data.token);
-      toast('Google Sign-In Successful');
+
+      const token = response.data.token;
+      localStorage.setItem('token', token);
       navigate('/dashboard');
-    } catch (err) {
-      console.error(err);
-      toast('Google Sign-In Failed');
+    } catch (error) {
+      console.error('Google sign-in failed:', error);
+      alert('Google sign-in failed. Please try again.');
     }
   };
 
@@ -33,7 +26,7 @@ const GoogleSignIn: React.FC = () => {
     <div className="w-full flex justify-center">
   <div className="w-full max-w-sm">
     <GoogleLogin
-      onSuccess={handleGoogleLoginSuccess}
+      onSuccess={handleCredentialResponse}
       onError={() => toast('Google Sign-In Failed')}
       logo_alignment="center"
       size="large"

@@ -17,40 +17,42 @@ const useContent = () => {
   const [loading, setLoading] = useState(true) // Start with loading true
   const [error, setError] = useState<string | null>(null)
 
-  const fetchData = async () => {
+  const fetchContent = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true)
-      setError(null)
-
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem('token');
       if (!token) {
-        throw new Error("No authentication token found")
+        setError('No authentication token found');
+        setLoading(false);
+        return;
       }
 
-      console.log("Fetching from:", `${import.meta.env.VITE_API_URL}/api/v1/content`)
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/content`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/content`, {
-        headers: {
-          Authorization: token,
-        },
-      })
-
-      console.log("Content fetched:", response.data)
-      setContents(response.data.content || [])
-    } catch (err: any) {
-      console.error("Fetch error:", err)
-      setError(err.response?.data?.message || err.message || "Failed to fetch content")
+      setContents(response.data.content || []);
+    } catch (error: any) {
+      console.error('Error fetching content:', error);
+      setError(error.response?.data?.message || 'Failed to fetch content');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData() // Fetch immediately on mount
+    fetchContent() // Fetch immediately on mount
 
     // Set up periodic refresh (optional)
     const interval = setInterval(() => {
-      fetchData()
+      fetchContent()
     }, 300000) // Refresh every 30 seconds
 
     return () => clearInterval(interval)
@@ -58,7 +60,7 @@ const useContent = () => {
 
   return {
     content: contents,
-    refetch: fetchData,
+    refetch: fetchContent,
     loading,
     error,
   }

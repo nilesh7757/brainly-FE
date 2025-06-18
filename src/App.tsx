@@ -7,20 +7,12 @@ import GoogleSignIn from "./pages/google"
 import SharePage from "./pages/SharePage"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Debug: Log the API URL on app load
-console.log("App loaded with API URL:", import.meta.env.VITE_API_URL)
-console.log("Environment variables:", {
-  VITE_API_URL: import.meta.env.VITE_API_URL,
-  NODE_ENV: import.meta.env.NODE_ENV,
-  MODE: import.meta.env.MODE,
-})
 
 // Test CORS connection
 const testCORS = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/cors-test`)
     const data = await response.json()
-    console.log("CORS test successful:", data)
   } catch (error) {
     console.error("CORS test failed:", error)
   }

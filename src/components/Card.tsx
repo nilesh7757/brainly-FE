@@ -50,7 +50,7 @@ declare global {
 }
 
 interface CardProps {
-  type: "YOUTUBE" | "TWITTER" | "DOCUMENT" | "UPLOAD";
+  type: "YOUTUBE" | "TWITTER" | "DOCUMENT";
   title: string;
   link: string;
   date: Date;
@@ -260,7 +260,7 @@ const Card = ({
     }
 
     // Document and Upload preview functionality (treat them the same)
-    if (type === 'DOCUMENT' || type === 'UPLOAD') {
+    if (type === 'DOCUMENT') {
       const getDocumentPreview = () => {
         const url = link.toLowerCase();
         
