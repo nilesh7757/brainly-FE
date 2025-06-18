@@ -119,9 +119,26 @@ const Card = ({
       const tweetId = extractTweetId(link);
       if (tweetId && window.twttr) {
         tweetRef.current.innerHTML = '';
+        
+        // Add CSS to ensure Twitter iframes don't overflow
+        const style = document.createElement('style');
+        style.textContent = `
+          .twitter-tweet {
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow: hidden !important;
+          }
+          .twitter-tweet iframe {
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow: hidden !important;
+          }
+        `;
+        document.head.appendChild(style);
+        
         window.twttr.widgets.createTweet(tweetId, tweetRef.current, {
           theme: 'light',
-          width: 'auto',
+          width: '100%',
           align: 'center'
         }).catch((error: any) => {
           console.error('Error loading tweet:', error);
@@ -246,8 +263,8 @@ const Card = ({
       }
 
       return (
-        <div className="relative h-full">
-          <div ref={tweetRef} className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center">
+        <div className="relative h-full overflow-hidden">
+          <div ref={tweetRef} className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center overflow-hidden">
             {!twitterLoaded && (
               <div className="flex items-center gap-3 text-gray-500">
                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
@@ -399,14 +416,14 @@ const Card = ({
   return (
     <div
       className={`
-        group relative bg-white border border-gray-200 rounded-3xl shadow-lg hover:shadow-2xl 
+        group relative bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-3xl shadow-lg hover:shadow-2xl 
         transition-all duration-500 ease-out transform hover:-translate-y-1
         w-full max-w-md backdrop-blur-sm overflow-hidden h-[500px] flex flex-col
         ${className}
       `}
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/30 pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/30 dark:from-slate-800 dark:via-transparent dark:to-slate-700/30 pointer-events-none"></div>
       
       <div className="relative p-6 flex flex-col h-full">
         {/* Header */}
@@ -414,11 +431,11 @@ const Card = ({
           <div className="flex items-center gap-4 flex-1 min-w-0">
             {getTypeIcon()}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-gray-900 text-base leading-tight mb-1 line-clamp-2">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-base leading-tight mb-1 line-clamp-2">
                 {title}
               </h3>
               {date && (
-                <time className="text-sm text-gray-500 font-medium">
+                <time className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                   {formatDate(date)}
                 </time>
               )}
@@ -440,8 +457,8 @@ const Card = ({
               <span
                 key={index}
                 className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold 
-                           bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border border-blue-200/50
-                           hover:from-blue-200 hover:to-indigo-200 hover:border-blue-300 
+                           bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/50 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/50
+                           hover:from-blue-200 hover:to-indigo-200 dark:hover:from-blue-800 dark:hover:to-indigo-800 hover:border-blue-300 dark:hover:border-blue-600
                            transition-all duration-200 cursor-default"
               >
                 #{tag}

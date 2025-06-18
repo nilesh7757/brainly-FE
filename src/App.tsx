@@ -7,6 +7,7 @@ import GoogleSignIn from "./pages/google"
 import SharePage from "./pages/SharePage"
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 
 // Test CORS connection
 const testCORS = async () => {
@@ -27,36 +28,47 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return token ? <>{children}</> : <Navigate to="/signup" replace />
 }
 
+// Toast Container with theme support
+const ThemedToastContainer = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <ToastContainer 
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme={theme}
+    />
+  );
+};
+
 const App = () => {
   return (
-    <BrowserRouter>
-      <ToastContainer 
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Routes>
-      <Route path="/share/:shareId" element={<SharePage />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/signin" element={<SignIn/>} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <ThemedToastContainer />
+        <Routes>
+          <Route path="/share/:shareId" element={<SharePage />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<SignIn/>} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 

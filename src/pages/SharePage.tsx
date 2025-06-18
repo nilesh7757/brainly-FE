@@ -3,6 +3,7 @@ import { ExternalLink, Tag, Brain, Share2, Calendar, User, Globe, Copy, CheckCir
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import Card from '../components/Card';
+import ThemeToggle from '../components/ThemeToggle';
 
 interface Content {
   _id: string;
@@ -175,7 +176,7 @@ const SharePage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="relative inline-flex mb-6">
             <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -190,7 +191,7 @@ const SharePage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-red-900 dark:via-red-800 dark:to-red-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
           <div className="w-20 h-20 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center">
             <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,28 +212,31 @@ const SharePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header Section */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-slate-700/50 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-1">
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                 {username}'s Knowledge Hub
               </h1>
-              <p className="text-gray-600 text-lg flex items-center">
+              <p className="text-gray-600 dark:text-gray-300 text-lg flex items-center">
                 <Share2 size={20} className="mr-2" />
                 Shared collection • {content.length} items
               </p>
             </div>
             
-            <button
-              onClick={copyToClipboard}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
-            >
-              {copied ? <CheckCircle size={20} /> : <Copy size={20} />}
-              <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <ThemeToggle />
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium"
+              >
+                {copied ? <CheckCircle size={20} /> : <Copy size={20} />}
+                <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -240,30 +244,30 @@ const SharePage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {content.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <Brain className="text-gray-400" size={48} />
+            <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-full mx-auto mb-8 flex items-center justify-center">
+              <Brain className="text-gray-400 dark:text-gray-500" size={48} />
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-4">No Content Shared</h3>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-200 mb-4">No Content Shared</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
               This collection is empty. The owner hasn't shared any content yet.
             </p>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-800">Shared Collection</h2>
-              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Shared Collection</h2>
+              <div className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
                 {filteredContent.length} of {content.length} items
               </div>
             </div>
 
             {/* Tags Overview Section */}
             {allTags.length > 0 && (
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg">
+              <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 dark:border-slate-700/50 shadow-lg">
                 <div className="flex items-center gap-3 mb-4">
-                  <Tag className="w-5 h-5 text-indigo-600" />
-                  <h3 className="text-lg font-semibold text-gray-800">Collection Tags</h3>
-                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  <Tag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Collection Tags</h3>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">
                     {allTags.length} tags
                   </span>
                 </div>
@@ -273,11 +277,11 @@ const SharePage: React.FC = () => {
                     return (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-medium border border-indigo-200 shadow-sm hover:shadow-md transition-all duration-200"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-full text-sm font-medium border border-indigo-200 dark:border-indigo-700 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <Tag className="w-3 h-3" />
                         {tag}
-                        <span className="bg-indigo-200 text-indigo-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                        <span className="bg-indigo-200 dark:bg-indigo-700 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full text-xs font-bold">
                           {tagCount}
                         </span>
                       </span>
@@ -288,11 +292,11 @@ const SharePage: React.FC = () => {
             )}
 
             {/* Filter Section */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg space-y-6">
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 dark:border-slate-700/50 shadow-lg space-y-6">
               {/* Content Type Filters */}
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by type:</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2">Filter by type:</span>
                   {contentTypes.map((type) => {
                     const IconComponent = type.icon;
                     const isSelected = selectedFilter === type.value;
@@ -304,10 +308,10 @@ const SharePage: React.FC = () => {
                         className={`relative px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
                           isSelected
                             ? `bg-gradient-to-r ${type.gradient} text-white shadow-lg`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent hover:border-gray-300'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
-                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
                         <span className="text-sm font-medium">{type.label}</span>
                         {isSelected && (
                           <div className="absolute inset-0 rounded-xl ring-2 ring-white/30"></div>
@@ -321,11 +325,11 @@ const SharePage: React.FC = () => {
               {/* Tag Filters */}
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by tags:</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2">Filter by tags:</span>
                   {selectedTags.length > 0 && (
                     <button
                       onClick={clearTagFilters}
-                      className="text-xs text-gray-500 hover:text-gray-700 underline"
+                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline"
                     >
                       Clear all
                     </button>

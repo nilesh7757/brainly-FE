@@ -4,6 +4,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import CreateContent from '../components/CreateContent';
 import ShareButton from '../icons/ShareButton';
+import ThemeToggle from '../components/ThemeToggle';
 import useContent from '../hooks/useContent';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -138,7 +139,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Modal */}
       {open && (
         <>
@@ -155,17 +156,18 @@ const Dashboard = () => {
       )}
 
       {/* Header Section */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-slate-700/50 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-1">
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Content Library
               </h1>
-              <p className="text-gray-600 text-lg">Your knowledge, beautifully organized</p>
+              <p className="text-gray-600 dark:text-gray-300 text-lg">Your knowledge, beautifully organized</p>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
+              <ThemeToggle />
               <Button
                 title="Sign Out"
                 size="sm"
@@ -203,21 +205,21 @@ const Dashboard = () => {
               <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
               <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-purple-400 rounded-full animate-spin animation-delay-150"></div>
             </div>
-            <p className="text-gray-600 mt-6 text-lg font-medium">Loading your content...</p>
-            <p className="text-gray-500 text-sm mt-2">This might take a moment</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-6 text-lg font-medium">Loading your content...</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">This might take a moment</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !loading && (
           <div className="text-center py-16">
-            <div className="bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-2xl p-8 max-w-md mx-auto shadow-lg">
-              <div className="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-red-50/80 dark:bg-red-900/20 backdrop-blur-sm border border-red-200 dark:border-red-800 rounded-2xl p-8 max-w-md mx-auto shadow-lg">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-red-700 font-medium mb-4">{error}</p>
+              <p className="text-red-700 dark:text-red-300 font-medium mb-4">{error}</p>
               <button
                 onClick={refetch}
                 className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
@@ -232,18 +234,18 @@ const Dashboard = () => {
         {!loading && !error && content.length > 0 && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-800">Your Collection</h2>
-              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Your Collection</h2>
+              <div className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
                 {filteredContent.length} of {content.length} items
               </div>
             </div>
 
             {/* Filter Section */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-lg space-y-6">
+            <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 dark:border-slate-700/50 shadow-lg space-y-6">
               {/* Content Type Filters */}
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by type:</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2">Filter by type:</span>
                   {contentTypes.map((type) => {
                     const IconComponent = type.icon;
                     const isSelected = selectedFilter === type.value;
@@ -255,10 +257,10 @@ const Dashboard = () => {
                         className={`relative px-4 py-2 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
                           isSelected
                             ? `bg-gradient-to-r ${type.gradient} text-white shadow-lg`
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent hover:border-gray-300'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border-2 border-transparent hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
-                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600'}`} />
+                        <IconComponent className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
                         <span className="text-sm font-medium">{type.label}</span>
                         {isSelected && (
                           <div className="absolute inset-0 rounded-xl ring-2 ring-white/30"></div>
@@ -272,11 +274,11 @@ const Dashboard = () => {
               {/* Tag Filters */}
               <div>
                 <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="text-sm font-semibold text-gray-700 mr-2">Filter by tags:</span>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 mr-2">Filter by tags:</span>
                   {selectedTags.length > 0 && (
                     <button
                       onClick={clearTagFilters}
-                      className="text-xs text-gray-500 hover:text-gray-700 underline"
+                      className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline"
                     >
                       Clear all
                     </button>
