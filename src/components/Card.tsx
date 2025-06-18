@@ -451,15 +451,17 @@ const Card = ({
         )}
 
         {/* Action Button */}
-        <div className="flex justify-center pt-2 flex-shrink-0">
-          <Button 
-            className="rounded-xl px-6 py-2.5 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" 
-            title="Delete" 
-            variant="primary" 
-            size="md" 
-            onClick={onClick} 
-          />
-        </div>
+        {onClick && (
+          <div className="flex justify-center pt-2 flex-shrink-0">
+            <Button 
+              className="rounded-xl px-6 py-2.5 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" 
+              title="Delete" 
+              variant="primary" 
+              size="md" 
+              onClick={onClick} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );
