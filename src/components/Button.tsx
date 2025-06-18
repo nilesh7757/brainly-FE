@@ -7,7 +7,7 @@ interface ButtonProps {
     endIcon?: ReactElement;
     variant: "primary" | "secondary";
     onClick?:()=>void;
-    className:string;
+    className?:string;
 }
 
 const sizeStyles = {
