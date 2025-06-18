@@ -43,7 +43,7 @@ const Dashboard = () => {
           Authorization: localStorage.getItem('token') || '',
         },
       });
-      const shareLink = "https://example.com/shared-link";
+      const shareLink = res.data.shareLink;
   
       if (!shareLink) {
         toast("No share link found.");
