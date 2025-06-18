@@ -39,7 +39,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/share/:shareId" element = {<SharePage />}/>
+      <Route path="/share/:shareId" element={<SharePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<SignIn/>} />
         <Route

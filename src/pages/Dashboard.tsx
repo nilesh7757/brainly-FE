@@ -37,6 +37,7 @@ const Dashboard = () => {
   }
 
   async function Share() {
+    // console.log("HELLO");
     try {
       const res = await axios.post(`${REACT_APP_API_URL}/api/v1/brain/share`, {}, {
         headers: {

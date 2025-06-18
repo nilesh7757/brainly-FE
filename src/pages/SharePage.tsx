@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { REACT_APP_API_URL } from "../config";
 
 interface Content {
   _id: string;
@@ -21,8 +22,9 @@ const SharePage = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/v1/brain/${shareId}`
+          `${REACT_APP_API_URL}/api/v1/brain/${shareId}`
         );
+        console.log(shareId);
         setUsername(res.data.username);
         setContent(res.data.content);
       } catch (err) {
