@@ -4,8 +4,17 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { REACT_APP_API_URL } from "../config"
 
+interface Content {
+  _id: string;
+  title: string;
+  link: string;
+  type: string;
+  tags: string[];
+  createdAt: string;
+}
+
 const useContent = () => {
-  const [contents, setContents] = useState([])
+  const [contents, setContents] = useState<Content[]>([])
   const [loading, setLoading] = useState(true) // Start with loading true
   const [error, setError] = useState<string | null>(null)
 
@@ -43,7 +52,7 @@ const useContent = () => {
     // Set up periodic refresh (optional)
     const interval = setInterval(() => {
       fetchData()
-    }, 30000) // Refresh every 30 seconds
+    }, 300000) // Refresh every 30 seconds
 
     return () => clearInterval(interval)
   }, [])

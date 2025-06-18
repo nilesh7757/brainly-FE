@@ -1,5 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
-import Button from './Button';
+
+// Mock Button component for demo
+const Button = ({ 
+  className = '', 
+  title, 
+  variant = 'primary', 
+  size = 'md', 
+  onClick 
+}: {
+  className?: string;
+  title: string;
+  variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md' | 'lg';
+  onClick?: () => void;
+}) => {
+  const baseClasses = "font-medium transition-all duration-200 flex items-center justify-center gap-2";
+  const variants = {
+    primary: "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl",
+    secondary: "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300"
+  };
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2 text-sm",
+    lg: "px-6 py-3 text-base"
+  };
+  
+  return (
+    <button 
+      className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+      onClick={onClick}
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      {title}
+    </button>
+  );
+};
 
 // TypeScript declarations for Twitter widget
 declare global {
@@ -40,7 +77,7 @@ const Card = ({
       /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([^?&\s]+)/,
       /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^?&\s]+)/,
       /(?:https?:\/\/)?(?:m\.)?youtube\.com\/watch\?[^#]*v=([^&\s]+)/,
-      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([^?&\s]+)/, // Added pattern for live URLs
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/live\/([^?&\s]+)/,
     ];
 
     for (const pattern of patterns) {
@@ -90,10 +127,10 @@ const Card = ({
           console.error('Error loading tweet:', error);
           if (tweetRef.current) {
             tweetRef.current.innerHTML = `
-              <div class="p-4 bg-red-50 rounded-xl">
-                <p class="text-sm text-red-600">Failed to load tweet</p>
-                <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-xs">
-                  View on Twitter/X
+              <div class="p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p class="text-sm text-red-600 font-medium mb-2">Failed to load tweet</p>
+                <a href="${link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline text-sm transition-colors">
+                  View on Twitter/X →
                 </a>
               </div>
             `;
@@ -107,24 +144,24 @@ const Card = ({
     switch (type) {
       case 'YOUTUBE':
         return (
-          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+            <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
               <path d="M8 5v14l11-7z"/>
             </svg>
           </div>
         );
       case 'TWITTER':
         return (
-          <div className="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
               <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
             </svg>
           </div>
         );
       default:
         return (
-          <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
-            <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4">
+          <div className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl flex items-center justify-center shadow-lg">
+            <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
             </svg>
           </div>
@@ -140,7 +177,7 @@ const Card = ({
         const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`;
 
         return (
-          <div className="relative overflow-hidden rounded-xl bg-black mt-3">
+          <div className="relative overflow-hidden rounded-2xl bg-black shadow-xl ring-1 ring-black/5">
             <iframe
               className="w-full aspect-video"
               src={embedUrl}
@@ -154,16 +191,26 @@ const Card = ({
         );
       } else {
         return (
-          <div className="p-4 bg-red-50 rounded-xl mt-3">
-            <p className="text-sm text-red-600 mb-1">Invalid YouTube link</p>
-            <p className="text-xs text-gray-600 mb-2 break-all">{link}</p>
+          <div className="p-6 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-red-700 font-medium">Invalid YouTube link</p>
+            </div>
+            <p className="text-sm text-red-600 mb-3 break-all bg-white/50 p-2 rounded-lg">{link}</p>
             <a
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-xs"
+              className="inline-flex items-center gap-2 text-red-600 hover:text-red-800 font-medium text-sm transition-colors"
             >
               Try opening on YouTube
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
           </div>
         );
@@ -174,25 +221,38 @@ const Card = ({
       const tweetId = extractTweetId(link);
       if (!tweetId) {
         return (
-          <div className="p-4 bg-red-50 rounded-xl mt-3">
-            <p className="text-sm text-red-600 mb-2">Invalid Twitter/X link</p>
+          <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <p className="text-blue-700 font-medium">Invalid Twitter/X link</p>
+            </div>
             <a
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-xs"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors break-all"
             >
               {link}
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
           </div>
         );
       }
 
       return (
-        <div className="mt-3">
-          <div ref={tweetRef} className="w-full min-h-[100px] bg-gray-50 rounded-xl p-4 flex items-center justify-center">
+        <div className="relative">
+          <div ref={tweetRef} className="w-full min-h-[120px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center">
             {!twitterLoaded && (
-              <div className="text-gray-500 text-sm">Loading tweet...</div>
+              <div className="flex items-center gap-3 text-gray-500">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+                <span className="text-sm font-medium">Loading tweet...</span>
+              </div>
             )}
           </div>
         </div>
@@ -200,15 +260,30 @@ const Card = ({
     }
 
     return (
-      <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl mt-3">
-        <a
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 font-medium text-sm break-all transition-colors"
-        >
-          {title}
-        </a>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-purple-50 border border-gray-200 shadow-sm">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5"></div>
+        <div className="relative p-6">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-3-3v6m5 1V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h6" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-start gap-2 text-gray-800 hover:text-indigo-600 font-medium text-sm transition-colors"
+              >
+                <span className="break-all leading-relaxed">{title}</span>
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 flex-shrink-0 mt-0.5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -224,43 +299,65 @@ const Card = ({
   return (
     <div
       className={`
-        bg-white border border-gray-200 rounded-2xl p-4 shadow-lg hover:shadow-xl 
-        transition-all duration-300 cursor-pointer transform hover:scale-105
-        w-full max-w-sm backdrop-blur-sm
+        group relative bg-white border border-gray-200 rounded-3xl shadow-lg hover:shadow-2xl 
+        transition-all duration-500 ease-out transform hover:-translate-y-1
+        w-full max-w-md backdrop-blur-sm overflow-hidden
         ${className}
       `}
-      // onClick={onClick}
     >
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-3">
-          {getTypeIcon()}
-          <h3 className="font-medium text-gray-900 text-sm truncate">{title}</h3>
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-gray-50/30 pointer-events-none"></div>
+      
+      <div className="relative p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
+            {getTypeIcon()}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-gray-900 text-base leading-tight mb-1 line-clamp-2">
+                {title}
+              </h3>
+              {date && (
+                <time className="text-sm text-gray-500 font-medium">
+                  {formatDate(date)}
+                </time>
+              )}
+            </div>
+          </div>
         </div>
-        {date && (
-          <span className="text-xs text-gray-500 flex-shrink-0">
-            {formatDate(date)}
-          </span>
+
+        {/* Content */}
+        <div className="mb-6">
+          {renderContent()}
+        </div>
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold 
+                           bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border border-blue-200/50
+                           hover:from-blue-200 hover:to-indigo-200 hover:border-blue-300 
+                           transition-all duration-200 cursor-default"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
         )}
-      </div>
 
-      <div className="mb-3">{renderContent()}</div>
-
-      {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <span
-              key={index}
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
-                         bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800
-                         hover:from-blue-200 hover:to-purple-200 transition-colors"
-            >
-              #{tag}
-            </span>
-          ))}
+        {/* Action Button */}
+        <div className="flex justify-center pt-2">
+          <Button 
+            className="rounded-xl px-6 py-2.5 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" 
+            title="Delete" 
+            variant="primary" 
+            size="md" 
+            onClick={onClick} 
+          />
         </div>
-      )}
-      <div className='flex justify-center'>
-        <Button className='rounded-md py-2 px-4' title="delete" variant='primary' size='md' onClick={onClick} />
       </div>
     </div>
   );
