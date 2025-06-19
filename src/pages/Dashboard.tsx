@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import PlusIcon from '../icons/PlusIcon';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -10,6 +10,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Youtube, Twitter, FileText, Filter, Tag, X } from 'lucide-react';
+import SignOutIcon from '../icons/SignOutIcon';
 
 type ContentType = 'YOUTUBE' | 'TWITTER' | 'DOCUMENT' | 'ALL';
 
@@ -19,6 +20,7 @@ const Dashboard = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { content, refetch, loading, error } = useContent();
   const navigate = useNavigate();
+  const [username, setUsername] = useState<string>('');
 
   // Get all unique tags from content
   const allTags = useMemo(() => {
@@ -94,6 +96,22 @@ const Dashboard = () => {
     setSelectedTags([]);
   };
 
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/user`, {
+          headers: { Authorization: token },
+        });
+        setUsername(res.data.username || '');
+      } catch (err) {
+        setUsername('');
+      }
+    };
+    fetchUsername();
+  }, []);
+
   async function deleteContent(contentId: string) {
     try {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/content`, {
@@ -161,19 +179,19 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="space-y-1">
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Content Library
+                {username ? `${username}'s Content Library` : 'Content Library'}
               </h1>
               <p className="text-gray-600 dark:text-gray-300 text-lg">Your knowledge, beautifully organized</p>
             </div>
             
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch gap-4 sm:gap-3">
               <ThemeToggle />
               <Button
                 title="Sign Out"
                 size="sm"
                 className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 font-medium"
                 variant="primary"
-                startIcon={<ShareButton />}
+                startIcon={<SignOutIcon />}
                 onClick={SignOut}
               />
               <Button
